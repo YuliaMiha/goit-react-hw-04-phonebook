@@ -1,39 +1,41 @@
 import { nanoid } from 'nanoid';
-import React, { Component } from 'react'
+import React, { useState } from 'react'
 import PropTypes from 'prop-types';
 import  css  from './ContactForm.module.css';
 
-class ContactForm extends Component {
-    state = {
-        name: '',
-        number:'',
-    }
-    handleChangeInfo = (e) => {
+export const ContactForm = ({ onAddContact }) =>{
+    const [name,setName] = useState('');
+    const [number, setNumber] = useState('');
+    const actions = {
+        name: setName,
+        number: setNumber,
+    };
+     const handleChange = (e) => {
         const { name, value } = e.target;
-        this.setState({ [name]: value });
-    }
-    handleSubmit = (e) => {
+        actions[name](value);
+    };
+
+    const handleSubmit = (e) => {
         e.preventDefault();
-        this.props.onAddContact({ ...this.state, id:nanoid() });
-        this.reset();
-    }
-    reset() {
-        this.setState({
-            name: '',  number:'',
-        })
-    }
+        onAddContact({ name, number, id:nanoid() });
+        handleReset();
+    };
+
+    const handleReset = () => {
+        console.log(Object.values(actions));
+        Object.values(actions).map(item => item(''));
+    
     nameInputId = nanoid();
     numberInputId = nanoid();
-    render() {
-        
-        const { name, number } = this.state;
         
         return (
            <form className={css.form} action="" onSubmit={this.handleSubmit}>
-                <label htmlFor={this.nameInputId} className={css.form__label}>Name</label>
+                <label htmlFor={this.nameInputId} className={css.form__label}>
+                    Name
+                    </label>
                 <input
-                  id={this.nameInputId}
-                  onChange={this.handleChangeInfo}
+                  id={nameInputId}
+                  onChange={handleChange}
                   name="name"
                   value={name}
                    type="text"
@@ -46,8 +48,8 @@ class ContactForm extends Component {
 
                   <label htmlFor={this.numberInputId} className={css.form__label}>Number</label>
               <input
-                  id={this.numberInputId}
-                  onChange={this.handleChangeInfo}
+                  id={numberInputId}
+                  onChange={handleChange}
                   name="number"
                   value={number}
                   type="tel"
@@ -66,5 +68,3 @@ class ContactForm extends Component {
 ContactForm.propTypes = {
     onAddContact: PropTypes.func.isRequired,
 }
-
-export default  ContactForm;
